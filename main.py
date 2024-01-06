@@ -1,9 +1,12 @@
+import re
+
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 
 num_clusters = 200
+occasion_factor = 0.5
 
 if __name__ == '__main__':
     print("hello")
@@ -24,8 +27,27 @@ if __name__ == '__main__':
     kmeans.fit(vectorized_documents)
     results = kmeans.labels_
 
+    clusters = [[] for i in range(num_clusters)]
     for i in range(len(df)):
-        if results[i] == 33:
-            print(percentage[i] + " " + prices[i] + " : " + abouts[i])
+        price = prices[i]
+        price = re.sub("[^0-9.]", "", price)
+        clusters[results[i]].append({"price": float(price), "desc": abouts[i]})
+
+    averages = [0]*num_clusters
+    for i in range(len(clusters)):
+        cluster = clusters[i]
+        for j in range(len(cluster)):
+            element = cluster[j]
+            averages[i] = averages[i] + element["price"]
+        averages[i] = averages[i]/len(clusters[i])
+
+    for i in range(len(clusters)):
+        cluster = clusters[i]
+        for j in range(len(cluster)):
+            element = cluster[j]
+            if element["price"] < occasion_factor*averages[i]:
+                print(element)
+
+    print(clusters[10])
 
     print("end")
