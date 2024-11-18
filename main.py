@@ -2,6 +2,8 @@ import re
 
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import HashingVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 
@@ -19,7 +21,9 @@ if __name__ == '__main__':
     prices = df['discounted_price'].to_numpy()
     percentage = df['discount_percentage'].to_numpy()
 
-    vectorizer = TfidfVectorizer(stop_words='english')
+    #vectorizer = TfidfVectorizer(stop_words='english')
+    #vectorizer = HashingVectorizer(n_features=1000)
+    vectorizer = CountVectorizer(ngram_range=(2, 2), stop_words='english')
     vectorized_documents = vectorizer.fit_transform(abouts)
 
     kmeans = KMeans(n_clusters=num_clusters, n_init=5,
@@ -33,21 +37,25 @@ if __name__ == '__main__':
         price = re.sub("[^0-9.]", "", price)
         clusters[results[i]].append({"price": float(price), "desc": abouts[i]})
 
-    averages = [0]*num_clusters
-    for i in range(len(clusters)):
-        cluster = clusters[i]
-        for j in range(len(cluster)):
-            element = cluster[j]
-            averages[i] = averages[i] + element["price"]
-        averages[i] = averages[i]/len(clusters[i])
+    # averages = [0]*num_clusters
+    # for i in range(len(clusters)):
+    #     cluster = clusters[i]
+    #     for j in range(len(cluster)):
+    #         element = cluster[j]
+    #         averages[i] = averages[i] + element["price"]
+    #     averages[i] = averages[i]/len(clusters[i])
+    #
+    # for i in range(len(clusters)):
+    #     cluster = clusters[i]
+    #     for j in range(len(cluster)):
+    #         element = cluster[j]
+    #         if element["price"] < occasion_factor*averages[i]:
+    #             print(element)
 
-    for i in range(len(clusters)):
+    for i in [33, 55, 188]:
         cluster = clusters[i]
-        for j in range(len(cluster)):
-            element = cluster[j]
-            if element["price"] < occasion_factor*averages[i]:
-                print(element)
-
-    print(clusters[10])
+        for item in cluster:
+            print(item)
+        print("")
 
     print("end")
